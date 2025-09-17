@@ -1,0 +1,64 @@
+# Copyright (c) IBM Corporation
+# SPDX-License-Identifier: MIT
+
+# The input to an experiment is an Entity. For the Entity to be a valid input
+# it's properties which  match what is defined here
+# Here we define an experiment that measures the accuracy of a model on the MMLU dataset
+mmlu_evaluation:
+  identifier: mmlu_evaluation
+  actuatorIdentifier: "llm_eval_harness"
+  requiredProperties: # Any entity passed to this experiment must have constitutive properties with these values
+    - identifier: 'vllm_endpoint_url' 
+      metadata:
+        description: 'The URL of the vllm endpoint to use'
+      propertyDomain: 
+        variableType: "UNKNOWN_VARIABLE_TYPE"
+        values: ["http://localhost:28015"]
+    - identifier: 'model_name'
+      metadata:
+        description: 'The name of the model to use. Must be served by the vllm endpoint.'
+      propertyDomain:
+        values: [ openai/gpt-oss-20b ]
+        variableType: 'CATEGORICAL_VARIABLE_TYPE'
+    - identifier: 'batch_size'
+      metadata:
+        description: 'The batch size to use. Vary this to test the performance of the model at different batch sizes.'
+      propertyDomain: 
+        values: [ 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024 ]
+        variableType: 'DISCRETE_VARIABLE_TYPE'
+  optionalProperties: # This a list of properties that an Entity can have (can be inputs) but if not have default values - see the defaultParameterization field
+    - identifier: 'num_fewshot'
+      metadata:
+        description: 'The number of few-shot examples to use. Vary this to test the performance of the model at different numbers of few-shot examples.'
+      propertyDomain: # A 
+        domainRange: [ 0, 10 ]
+        interval: 1
+        variableType: 'DISCRETE_VARIABLE_TYPE'
+    - identifier: 'limit'
+      metadata:
+        description: 'The maximum number of samples to evaluate'
+      propertyDomain: # Example discrete variable with range and interval
+        domainRange: [1, 10000]
+        interval: 1
+        variableType: 'DISCRETE_VARIABLE_TYPE'
+    - identifier: 'output_path'
+      metadata:
+          description: 'The path to save the output results'
+      propertyDomain: # Example continuous variable with range and interval
+        values: [ 'output.json' ]
+        variableType: 'CATEGORICAL_VARIABLE_TYPE'
+  defaultParameterization: # If there are optional properties this field must give the default values for them
+    - value: 0 # The default value
+      property:
+        identifier: 'num_fewshot'  #The id of the property whose default value this is
+    - value: 10000
+      property:
+        identifier: 'limit'
+    - value: 'output.json'
+      property:
+        identifier: 'output_path'
+  targetProperties: # What properties experiment will measure
+    - identifier: accuracy
+    - identifier: acc_norm
+  metadata:
+    description: 'Measures accuracy of a model on the MMLU dataset'

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true # This is on by default, including it for clarity
+
+[tool.setuptools_scm]
+root = "../../../"
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["build", "build.*", "examples"]
+
+[tool.setuptools.package-data]
+# Note: This is optional. If you don't specify every non python file that's in SCM will be added
+llm_eval_harness_actuator = ["actuator_definitions.yaml", # Required: The file that describes the actuator classes the plugin provides
+                        "experiments.yaml" # Optional file that contains definitions for experiment catalog
+                        ]
+[project]
+name="llm_eval_harness" # Name for the new plugin
+description="An actuator for running EleutherAI llm-eval-harness benchmarks" # Description for the new actuator
+dynamic = ["version"]
+dependencies=[
+    "lm-eval"
+]

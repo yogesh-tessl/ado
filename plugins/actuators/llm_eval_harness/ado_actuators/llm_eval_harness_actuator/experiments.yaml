@@ -31,14 +31,14 @@ mmlu_evaluation:
       metadata:
         description: 'The number of few-shot examples to use. Vary this to test the performance of the model at different numbers of few-shot examples.'
       propertyDomain: # A 
-        domainRange: [ 0, 10 ]
+        domainRange: [ 0, 11 ]
         interval: 1
         variableType: 'DISCRETE_VARIABLE_TYPE'
     - identifier: 'limit'
       metadata:
         description: 'The maximum number of samples to evaluate'
       propertyDomain: # Example discrete variable with range and interval
-        domainRange: [1, 10000]
+        domainRange: [1, 10001]
         interval: 1
         variableType: 'DISCRETE_VARIABLE_TYPE'
     - identifier: 'output_path'

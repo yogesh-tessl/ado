@@ -4,10 +4,11 @@ import json
 import typing
 
 import ray
+from lm_eval.evaluator import simple_evaluate
 
 from orchestrator.modules.actuators.measurement_queue import MeasurementQueue
 from orchestrator.schema.experiment import Experiment, ParameterizedExperiment
-from orchestrator.schema.observed_property import ObservedPropertyValue
+from orchestrator.schema.property_value import PropertyValue
 from orchestrator.schema.request import MeasurementRequest, MeasurementRequestStateEnum
 from orchestrator.schema.result import ValidMeasurementResult
 from orchestrator.utilities.support import get_experiment_input_values
@@ -20,9 +21,7 @@ def llm_eval_harness_vllm_experiment(
     model_name: str,
     num_fewshot: int = 0,
     limit: int | None = None,
-    output_path: str | None = None,
     seed: int | None = None,
-    use_cache: bool = True,
     tasks: list[str] = ["arc_challenge"],
     **extra_args,
 ) -> dict[str, typing.Any]:
@@ -38,9 +37,7 @@ def llm_eval_harness_vllm_experiment(
         batch_size: The batch size to use for evaluation.
         num_fewshot: The number of few-shot examples to use. Default is 0.
         limit: The maximum number of samples to evaluate. Optional.
-        output_path: Path to save the output results. Optional.
         seed: Random seed for reproducibility. Optional.
-        use_cache: Whether to use caching for evaluation. Default is True.
         tasks: A list of tasks (benchmarks) to evaluate (e.g., ["arc_challenge"]). Default is ["arc_challenge"].
         **extra_args: Any other arguments supported by lm_eval.evaluate.simple_evaluate (such as additional configuration options).
 
@@ -49,7 +46,6 @@ def llm_eval_harness_vllm_experiment(
         A dictionary of the measured values.
     """
     # Call llm-eval-harness  to run the experiment
-    from lm_eval import evaluate
 
     # For vllm, you specify the vllm endpoint URL and the model name served by that endpoint.
     # The model name is passed as part of model_args, e.g. "vllm_api_url=...,model=<model_name>"
@@ -58,17 +54,15 @@ def llm_eval_harness_vllm_experiment(
         raise ValueError(
             "You must provide 'model_name' as an argument for vllm evaluation."
         )
-    model_args = f"vllm_api_url={vllm_endpoint_url},model={model_name}"
-    return evaluate.simple_evaluate(
-        model="vllm",
+    model_args = f"api_base={vllm_endpoint_url},model={model_name},tokenizer=gpt2"
+    return simple_evaluate(
+        model="openai-completions",
         model_args=model_args,
         batch_size=batch_size,
         tasks=tasks,
         num_fewshot=num_fewshot,
         limit=limit,
-        output_path=output_path,
-        seed=seed,
-        use_cache=use_cache,
+        random_seed=seed,
         **extra_args,
     )
 
@@ -77,13 +71,10 @@ def llm_eval_harness_hf_experiment(
     model: str,
     hf_token: str,
     batch_size: int,
-    dataset: str | None = None,
     device: str = "cpu",
     num_fewshot: int = 0,
     limit: int | None = None,
-    output_path: str | None = None,
     seed: int | None = None,
-    use_cache: bool = True,
     tasks: list[str] = ["arc_challenge"],
     **extra_args,
 ) -> dict[str, typing.Any]:
@@ -96,14 +87,11 @@ def llm_eval_harness_hf_experiment(
     Args:
         model: The model to use for the experiment (e.g., "meta-llama/Llama-3.1-8B-Instruct").
         hf_token: The HuggingFace token for model access.
-        dataset: The dataset to use for the experiment (e.g., "openai/openai_arc_challenge"). Note: The `dataset` argument is not required unless you want to override the default dataset for a task.
         batch_size: The batch size to use for evaluation.
         device: The device to run the evaluation on (e.g., "cuda", "cpu"). Default is "cpu".
         num_fewshot: The number of few-shot examples to use. Default is 0.
         limit: The maximum number of samples to evaluate. Optional.
-        output_path: Path to save the output results. Optional.
         seed: Random seed for reproducibility. Optional.
-        use_cache: Whether to use caching for evaluation. Default is True.
         tasks: A list of tasks (benchmarks) to evaluate (e.g., ["arc_challenge"]). Default is ["arc_challenge"].
         **extra_args: Any other arguments supported by lm_eval.evaluate.simple_evaluate (such as additional configuration options).
 
@@ -111,21 +99,17 @@ def llm_eval_harness_hf_experiment(
         A dictionary of the measured values.
     """
     # Call llm-eval-harness  to run the experiment
-    from lm_eval import evaluate
 
     model_args = f"pretrained={model},token={hf_token}"
-    return evaluate.simple_evaluate(
+    return simple_evaluate(
         model="hf",
         model_args=model_args,
-        dataset=dataset,
         batch_size=batch_size,
         tasks=tasks,
         device=device,
         num_fewshot=num_fewshot,
         limit=limit,
-        output_path=output_path,
-        seed=seed,
-        use_cache=use_cache,
+        random_seed=seed,
         **extra_args,
     )
 
@@ -137,10 +121,7 @@ def llm_eval_harness_mmlu_experiment_vllm(
     device: str = "cpu",
     num_fewshot: int = 0,
     limit: int | None = None,
-    metrics: list[str] = ["accuracy"],
-    output_path: str | None = None,
     seed: int | None = None,
-    use_cache: bool = True,
     **extra_args,
 ) -> dict[str, typing.Any]:
     """
@@ -156,9 +137,7 @@ def llm_eval_harness_mmlu_experiment_vllm(
         device=device,
         num_fewshot=num_fewshot,
         limit=limit,
-        output_path=output_path,
         seed=seed,
-        use_cache=use_cache,
         tasks=["mmlu"],
         **extra_args,
     )
@@ -198,7 +177,7 @@ def run_experiment(
 
         # Augment the values returned by llm_eval_harness_experiment to the structure used by ado
         measuredValues = [
-            ObservedPropertyValue(
+            PropertyValue(
                 value=identifier,
                 property=experiment.observedPropertyForTargetIdentifier(identifier),
             )

@@ -86,7 +86,7 @@ def show_entities_for_resources(
         ),
     ] = None,
     entity_type: Annotated[
-        AdoShowEntitiesSupportedEntityTypes | None,
+        AdoShowEntitiesSupportedEntityTypes,
         typer.Option(
             "--include",
             help="The type of entities to include. Ignored for operations.",

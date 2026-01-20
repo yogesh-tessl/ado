@@ -15,7 +15,9 @@ from orchestrator.core import CoreResourceKinds
 
 
 def get_effective_resource_id(
-    explicit_resource_id: str, resource_type: str, ado_configuration: AdoConfiguration
+    explicit_resource_id: str | None,
+    resource_type: str,
+    ado_configuration: AdoConfiguration,
 ) -> str:
     """
     Determines the effective resource ID to use, prioritizing an explicitly provided ID.
@@ -25,7 +27,7 @@ def get_effective_resource_id(
     based on the resource type. If no ID is found, the program exits with an error.
 
     Args:
-        explicit_resource_id (str): The resource ID explicitly provided by the user.
+        explicit_resource_id (str | None): (Optional) The resource ID explicitly provided by the user.
         resource_type (str): The type of resource (i.e., a cli resource type).
         ado_configuration (AdoConfiguration): Configuration object containing latest resource IDs.
 

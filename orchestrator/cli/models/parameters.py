@@ -49,7 +49,7 @@ class AdoCreateCommandParameters(pydantic.BaseModel):
     ado_configuration: AdoConfiguration
     dry_run: bool
     new_sample_store: bool
-    override_values: list[dict[str, str | None]]
+    override_values: list[dict[str, str]]
     resource_configuration_file: Path | None
     resource_type: AdoCreateSupportedResourceTypes
     use_default_sample_store: bool

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 import os
 import pathlib
+import typing
 from typing import Annotated
 
 import typer
@@ -60,6 +61,12 @@ def resource_type_callback(
     # and not what we are creating. Here, we perform the stricter
     # validation if we're not running ado create context
     if value != AdoCreateSupportedResourceTypes.CONTEXT:
+        import click.core
+
+        # This function is invoked as part of the ado create command
+        # This means that we are sure that ctx.parent is not None
+        ctx.parent = typing.cast(click.core.Context, ctx.parent)
+
         project_context_param = ctx.parent.params["project_context_file"]
         project_context_file = (
             pathlib.Path(project_context_param) if project_context_param else None

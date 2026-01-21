@@ -235,8 +235,13 @@ def create_resource(
         raise typer.Exit(1)
 
     ado_configuration: AdoConfiguration = ctx.obj
-    override_values = parse_key_value_pairs(set_values)
     parsed_with_resource_options = parse_with_resource_options(with_resources)
+
+    # parse_key_value_pairs only returns None as a value if
+    # allow_only_key is explicitly set to True.
+    override_values = typing.cast(
+        list[dict[str, str]], parse_key_value_pairs(set_values)
+    )
 
     parameters = AdoCreateCommandParameters(
         ado_configuration=ado_configuration,

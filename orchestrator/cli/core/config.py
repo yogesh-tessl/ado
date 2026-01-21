@@ -30,7 +30,7 @@ ADO_CONFIG_FILE_NAME = "ado_cli_config.json"
 
 class AdoConfiguration(pydantic.BaseModel):
     _app_dir: Path = Path(typer.get_app_dir(ADO_APP_NAME))
-    _project_context: ProjectContext | None = None
+    _project_context: ProjectContext
     active_context: str | None = None
     latest_resource_ids: dict[CoreResourceKinds, str] = {}
 
@@ -49,7 +49,7 @@ class AdoConfiguration(pydantic.BaseModel):
         """
         # We need to instantiate an AdoConfiguration, as we could already
         # have a valid one on disk which contains the active context.
-        ado_config = AdoConfiguration()
+        ado_config = AdoConfiguration(_project_context=ProjectContext())
 
         # For testing, we might want to override the config directory
         if _override_config_dir:
@@ -158,7 +158,7 @@ class AdoConfiguration(pydantic.BaseModel):
         self.config_file.write_text(self.model_dump_json())
 
     @property
-    def project_context(self) -> ProjectContext | None:
+    def project_context(self) -> ProjectContext:
         return self._project_context
 
     @property

@@ -198,11 +198,13 @@ def show_summary_for_resources(
         ids = [resource_id]
 
     try:
-        query = prepare_query_filters_for_db(parse_key_value_pairs(query))
+        parsed_query_filters = prepare_query_filters_for_db(
+            parse_key_value_pairs(query)
+        )
         if labels:
             for parsed_label in parse_key_value_pairs(labels):
                 for k, v in parsed_label.items():
-                    query.extend(
+                    parsed_query_filters.extend(
                         prepare_query_filters_for_db({"config.metadata.labels": {k: v}})
                     )
     except ValueError as e:
@@ -214,7 +216,7 @@ def show_summary_for_resources(
         columns_to_hide=columns_to_hide,
         include_properties=include_properties,
         output_format=output_format,
-        query=query,
+        query=parsed_query_filters,
         render_output=render_output,
         resource_ids=ids,
     )

@@ -91,9 +91,9 @@ def console_print(
 
 # Template prints
 def no_resource_with_id_in_db_error_str(
-    resource_id: str, kind: CoreResourceKinds, context: str
+    resource_id: str, kind: CoreResourceKinds | None, context: str
 ) -> str:
-    kind_specifier = f" and kind {magenta(kind.value)}"
+    kind_specifier = f" and kind {magenta(kind.value)}" if kind else ""
     return (
         f"{ERROR}The database does not contain a resource with id {magenta(resource_id)}{kind_specifier}.\n"
         f"{HINT}Your active context is {cyan(context)} - are you sure it's the correct one?\n"

@@ -287,7 +287,7 @@ def parse_with_resource_options(
     user_provided_options: list[str] | None,
 ) -> dict[CoreResourceKinds, pathlib.Path | str]:
 
-    parsed_options = {}
+    parsed_options: dict[CoreResourceKinds, pathlib.Path | str] = {}
     if not user_provided_options:
         return parsed_options
 

@@ -52,7 +52,7 @@ def show_results_for_resources(
         typer.Option(
             "-o", "--output-format", help="The format in which to output the results."
         ),
-    ] = AdoShowResultsSupportedOutputFormats.CONSOLE.value,
+    ] = AdoShowResultsSupportedOutputFormats.CONSOLE,
     hide_fields: Annotated[
         list[str] | None,
         typer.Option(

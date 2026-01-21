@@ -130,7 +130,7 @@ def show_summary_for_resources(
             "-o",
             help="The format in which to output the summary.",
         ),
-    ] = AdoShowSummarySupportedOutputFormats.TABLE.value,
+    ] = AdoShowSummarySupportedOutputFormats.TABLE,
     render_output: Annotated[
         bool,
         typer.Option(

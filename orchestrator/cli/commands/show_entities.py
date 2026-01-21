@@ -92,17 +92,17 @@ def show_entities_for_resources(
             help="The type of entities to include. Ignored for operations.",
             rich_help_panel=SPACE_PANEL_NAME,
         ),
-    ] = AdoShowEntitiesSupportedEntityTypes.MEASURED.value,
+    ] = AdoShowEntitiesSupportedEntityTypes.MEASURED,
     property_format: Annotated[
         AdoShowEntitiesSupportedPropertyFormats,
         typer.Option(
             help="The naming format to be used when displaying measured properties."
         ),
-    ] = AdoShowEntitiesSupportedPropertyFormats.TARGET.value,
+    ] = AdoShowEntitiesSupportedPropertyFormats.TARGET,
     output_format: Annotated[
         AdoShowEntitiesSupportedOutputFormats,
         typer.Option(help="The format in which to output the entities."),
-    ] = AdoShowEntitiesSupportedOutputFormats.CONSOLE.value,
+    ] = AdoShowEntitiesSupportedOutputFormats.CONSOLE,
     properties: Annotated[
         list[str] | None,
         typer.Option(

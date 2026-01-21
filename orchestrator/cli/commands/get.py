@@ -121,7 +121,7 @@ def get_resource(
             show_default=False,
             help="Output information in a different format. Not all formats may be supported by all resources.",
         ),
-    ] = AdoGetSupportedOutputFormats.DEFAULT.value,
+    ] = AdoGetSupportedOutputFormats.DEFAULT,
     exclude_default: Annotated[
         bool,
         typer.Option(

@@ -54,7 +54,7 @@ def edit_resource(
     editor: Annotated[
         AdoEditSupportedEditors,
         typer.Option(envvar="ADO_EDITOR", help="The editor to use to edit metadata"),
-    ] = AdoEditSupportedEditors.NANO.value,
+    ] = AdoEditSupportedEditors.NANO,
 ) -> None:
     """
     Edit resources' metadata.

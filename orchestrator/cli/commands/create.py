@@ -299,6 +299,10 @@ def parse_with_resource_options(
     for with_option in parse_key_value_pairs(user_provided_options):
         for resource_type, value in with_option.items():
 
+            # parse_key_value_pairs only returns None as a value if
+            # allow_only_key is explicitly set to True.
+            value = typing.cast(str, value)
+
             resource_type = resource_shorthands_to_full_names(resource_type)
             if resource_type not in supported_resource_types:
                 console_print(
@@ -311,12 +315,12 @@ def parse_with_resource_options(
                 raise typer.Exit(1)
 
             # Now we know the resource_type can be parsed as a CoreResourceKinds
-            resource_type = CoreResourceKinds(resource_type)
+            resource_kind = CoreResourceKinds(resource_type)
 
             # Since we are dealing with a dictionary, we can only support one --with option per resource type
-            if resource_type in parsed_options:
+            if resource_kind in parsed_options:
                 console_print(
-                    f"{ERROR}The {resource_type.value} resource type was specified more than once.",
+                    f"{ERROR}The {resource_kind.value} resource kind was specified more than once.",
                     stderr=True,
                 )
                 raise typer.Exit(1)
@@ -331,13 +335,13 @@ def parse_with_resource_options(
             value_must_be_path = "." in value or os.sep in value
             value_as_path = pathlib.Path(value)
             if value_as_path.exists() and value_as_path.is_file():
-                parsed_options[resource_type] = value_as_path
+                parsed_options[resource_kind] = value_as_path
             elif value_must_be_path:
                 console_print(
                     f"{ERROR}{value} does not exist or is not a file.", stderr=True
                 )
                 raise typer.Exit(1)
             else:
-                parsed_options[resource_type] = value
+                parsed_options[resource_kind] = value
 
     return parsed_options

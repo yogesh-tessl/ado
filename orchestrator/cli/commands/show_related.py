@@ -105,6 +105,8 @@ def show_related_for_resources(
             ado_configuration=ado_configuration,
         )
 
+    # We are now sure resource_id is a str
+    resource_id = typing.cast(str, resource_id)
     parameters = AdoShowRelatedCommandParameters(
         ado_configuration=ado_configuration, resource_id=resource_id
     )

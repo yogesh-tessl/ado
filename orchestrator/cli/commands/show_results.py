@@ -106,6 +106,8 @@ def show_results_for_resources(
             ado_configuration=ado_configuration,
         )
 
+    # We are now sure resource_id is a str
+    resource_id = typing.cast(str, resource_id)
     parameters = AdoShowResultsCommandParameters(
         ado_configuration=ado_configuration,
         hide_fields=hide_fields,

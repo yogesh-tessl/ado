@@ -236,7 +236,7 @@ def create_resource(
 
     ado_configuration: AdoConfiguration = ctx.obj
     override_values = parse_key_value_pairs(set_values)
-    with_resources = parse_with_resource_options(with_resources)
+    parsed_with_resource_options = parse_with_resource_options(with_resources)
 
     parameters = AdoCreateCommandParameters(
         ado_configuration=ado_configuration,
@@ -247,7 +247,7 @@ def create_resource(
         resource_type=resource_type,
         use_default_sample_store=use_default_sample_store,
         use_latest=use_latest,
-        with_resources=with_resources,
+        with_resources=parsed_with_resource_options,
     )
 
     method_mapping = {

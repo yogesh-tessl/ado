@@ -211,6 +211,9 @@ def validate_operation(
     ):
         module_name = resource_configuration.operation.module.moduleName
         module_class = resource_configuration.operation.module.moduleClass
+        if module_name is None or module_class is None:
+            raise ValueError("moduleName and moduleClass cannot be None")
+
         import importlib
 
         try:

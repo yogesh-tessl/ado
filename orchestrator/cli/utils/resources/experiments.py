@@ -1,5 +1,6 @@
 # Copyright (c) IBM Corporation
 # SPDX-License-Identifier: MIT
+import typing
 
 import typer
 
@@ -125,6 +126,10 @@ def _ado_get_actuator_from_experiment_id(
             if len(e.actuators_with_experiments) > 1
             else f"{HINT}Did you mean {magenta(e.actuators_with_experiments.pop())}?"
         )
+
+        # actuator_id is optional, but the only case it can be None and
+        # we do not find the experiment is handled by NoActuatorWithExperimentError
+        actuator_id = typing.cast(str, actuator_id)
         console_print(
             f"{ERROR}Requested actuator {magenta(actuator_id)} does not have "
             f"experiment {magenta(experiment_id)}\n{hint_text}",

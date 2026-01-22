@@ -55,4 +55,6 @@ def df_to_output(
     elif output_format == "json":
         df.to_json(file_name)
 
+    # file_name cannot be None when the output type isn't console
+    file_name = typing.cast(str, file_name)
     console_print(f"{SUCCESS} Output saved as {magenta(file_name)}", stderr=True)

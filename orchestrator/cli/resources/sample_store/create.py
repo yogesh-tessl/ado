@@ -73,7 +73,7 @@ def create_sample_store(parameters: AdoCreateCommandParameters) -> str:
 
     if parameters.dry_run:
         console_print(ADO_CREATE_DRY_RUN_CONFIG_VALID, stderr=True)
-        return None
+        raise typer.Exit(0)
 
     from orchestrator.core.samplestore.utils import create_sample_store_resource
 

@@ -26,9 +26,9 @@ from orchestrator.core.operation.config import (
 
 
 def template_operation(parameters: AdoTemplateCommandParameters) -> None:
-    import orchestrator.modules.operators.collections
+    from orchestrator.modules.operators.collections import operationCollectionMap
 
-    operators = orchestrator.modules.operators.collections.operationCollectionMap
+    operators = operationCollectionMap
     supported_operator_types = operators.keys()
 
     # Exit early on wrong configurations
@@ -138,7 +138,7 @@ def template_operation(parameters: AdoTemplateCommandParameters) -> None:
         else parameters.output_path
     )
 
-    orchestrator.cli.utils.pydantic.serializers.serialise_pydantic_model(
+    serialise_pydantic_model(
         model=model_instance,
         output_path=output_path,
     )
@@ -150,19 +150,15 @@ def template_operation(parameters: AdoTemplateCommandParameters) -> None:
             if parameters.parameters_only_schema
             else model_instance
         )
-        orchestrator.cli.utils.pydantic.serializers.serialise_pydantic_model_json_schema(
-            schema_model_instance, schema_output_path
-        )
+        serialise_pydantic_model_json_schema(schema_model_instance, schema_output_path)
 
 
 def find_operator_type_by_name(
     operator_name: str,
 ) -> DiscoveryOperationEnum | None:
-    import orchestrator.modules.operators.collections
+    from orchestrator.modules.operators.collections import operationCollectionMap
 
-    supported_operator_types = (
-        orchestrator.modules.operators.collections.operationCollectionMap.keys()
-    )
+    supported_operator_types = operationCollectionMap.keys()
 
     for operator_type in supported_operator_types:
         if operator_type_has_operator(operator_name, operator_type):
@@ -175,11 +171,6 @@ def operator_type_has_operator(
     operator_name: str,
     operator_type: DiscoveryOperationEnum,
 ) -> bool:
-    import orchestrator.modules.operators.collections
+    from orchestrator.modules.operators.collections import operationCollectionMap
 
-    return (
-        operator_name
-        in orchestrator.modules.operators.collections.operationCollectionMap[
-            operator_type
-        ].function_operations
-    )
+    return operator_name in operationCollectionMap[operator_type].function_operations

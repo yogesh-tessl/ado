@@ -65,8 +65,14 @@ def show_operation_details(parameters: AdoShowDetailsCommandParameters) -> None:
 
             from orchestrator.schema.result import ValidMeasurementResult
 
-            measurement_results_for_operation = space.measurement_results_for_operation(
-                operation_id=parameters.resource_id
+            # TODO(AP): 22/01/2026
+            # https://github.com/IBM/ado/issues/450
+            # ty thinks the keyword parameters do not exist
+            # it also thinks we're missing parameters for the function call
+            measurement_results_for_operation = (
+                space.measurement_results_for_operation(  # ty: ignore[missing-argument]
+                    operation_id=parameters.resource_id  # ty: ignore[unknown-argument]
+                )
             )
 
             entities_with_all_successful_measurements = {

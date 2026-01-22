@@ -153,15 +153,21 @@ def format_default_ado_get_multiple_resources(
 
 
 def format_resource_for_ado_get_custom_format(
-    to_print: (
-        ADOResource
-        | list[ADOResource]
-        | pydantic.BaseModel
-        | list[pydantic.BaseModel]
-        | dict
-    ),
+    to_print: ADOResource | list[ADOResource] | dict,
     parameters: AdoGetCommandParameters,
 ) -> str:
+
+    # Dictionaries are supported only for the RAW format
+    if parameters.output_format == AdoGetSupportedOutputFormats.RAW:
+        if not isinstance(to_print, dict):
+            raise ValueError(
+                f"The {parameters.output_format.value} output format "
+                f"can only be used with raw dictionaries"
+            )
+
+        return _raw_formatter_for_ado_resource(to_print=to_print, parameters=parameters)
+
+    to_print = typing.cast(ADOResource | list[ADOResource], to_print)
     match parameters.output_format:
         case AdoGetSupportedOutputFormats.CONFIG:
             return _config_formatter_for_ado_resource(
@@ -175,10 +181,6 @@ def format_resource_for_ado_get_custom_format(
             return _json_formatter_for_ado_resource(
                 to_print=to_print, parameters=parameters
             )
-        case AdoGetSupportedOutputFormats.RAW:
-            return _raw_formatter_for_ado_resource(
-                to_print=to_print, parameters=parameters
-            )
         case _:
             raise ValueError(
                 f"Output format {parameters.output_format.value} is not supported."
@@ -186,13 +188,7 @@ def format_resource_for_ado_get_custom_format(
 
 
 def _config_formatter_for_ado_resource(
-    to_print: (
-        ADOResource
-        | list[ADOResource]
-        | pydantic.BaseModel
-        | list[pydantic.BaseModel]
-        | dict
-    ),
+    to_print: ADOResource | list[ADOResource],
     parameters: AdoGetCommandParameters,
 ) -> str:
 
@@ -200,9 +196,10 @@ def _config_formatter_for_ado_resource(
         console_print(f"{ERROR}{ADO_GET_CONFIG_ONLY_WHEN_SINGLE_RESOURCE}", stderr=True)
         raise typer.Exit(1)
 
-    if not hasattr(to_print, "config"):
+    if not isinstance(to_print, ADOResource):
         console_print(
-            f"{ERROR}The resource requested does not have a config field.", stderr=True
+            f"{ERROR}This method can be used only on AdoResource instances.",
+            stderr=True,
         )
         raise typer.Exit(1)
 
@@ -241,13 +238,7 @@ def _config_formatter_for_ado_resource(
 
 
 def _yaml_formatter_for_ado_resource(
-    to_print: (
-        ADOResource
-        | list[ADOResource]
-        | pydantic.BaseModel
-        | list[pydantic.BaseModel]
-        | dict
-    ),
+    to_print: ADOResource | list[ADOResource],
     parameters: AdoGetCommandParameters,
 ) -> str:
 
@@ -286,9 +277,7 @@ def _yaml_formatter_for_ado_resource(
 
 
 def _json_formatter_for_ado_resource(
-    to_print: (
-        ADOResource | list[ADOResource] | pydantic.BaseModel | list[pydantic.BaseModel]
-    ),
+    to_print: ADOResource | list[ADOResource],
     parameters: AdoGetCommandParameters,
 ) -> str:
 
@@ -356,13 +345,7 @@ def _json_formatter_for_ado_resource(
 
 
 def _raw_formatter_for_ado_resource(
-    to_print: (
-        ADOResource
-        | list[ADOResource]
-        | pydantic.BaseModel
-        | list[pydantic.BaseModel]
-        | dict
-    ),
+    to_print: dict,
     parameters: AdoGetCommandParameters,
 ) -> str:
     import pprint
@@ -377,10 +360,8 @@ def _raw_formatter_for_ado_resource(
 
 
 def _minimize_ado_resource_representation(
-    to_print: (
-        ADOResource | list[ADOResource] | pydantic.BaseModel | list[pydantic.BaseModel]
-    ),
-) -> ADOResource | pydantic.BaseModel:
+    to_print: ADOResource | list[ADOResource],
+) -> ADOResource:
     if isinstance(to_print, list):
         console_print(
             f"{ERROR}The minimal output format can only be used "
@@ -409,7 +390,9 @@ def most_important_status_update(
 ) -> OperationResourceStatus:
 
     if not statuses:
-        return OperationResourceStatus(event=ADOResourceEventEnum.ADDED)
+        return OperationResourceStatus(
+            event=ADOResourceEventEnum.ADDED
+        )  # ty:ignore[missing-argument]
 
     status_updates = [s.event for s in statuses]
     for important_event in event_importance_order:
@@ -417,7 +400,9 @@ def most_important_status_update(
             idx = status_updates.index(important_event)
             return statuses[idx]
 
-    return OperationResourceStatus(event=ADOResourceEventEnum.ADDED)
+    return OperationResourceStatus(
+        event=ADOResourceEventEnum.ADDED
+    )  # ty:ignore[missing-argument]
 
 
 def timedelta_to_string(total_seconds: float) -> str:

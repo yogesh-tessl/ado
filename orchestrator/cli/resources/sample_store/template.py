@@ -17,8 +17,11 @@ def template_sample_store(parameters: AdoTemplateCommandParameters) -> None:
         serialise_pydantic_model_json_schema,
     )
 
-    model_instance = SampleStoreConfiguration(
-        specification=SampleStoreSpecification(
+    # TODO(AP) 22/01/2026:
+    # https://github.com/IBM/ado/issues/449
+    # ty still doesn't understand pydantic's default_factory
+    model_instance = SampleStoreConfiguration(  # ty:ignore[missing-argument]
+        specification=SampleStoreSpecification(  # ty:ignore[missing-argument]
             module=SampleStoreModuleConf(
                 moduleClass="SQLSampleStore",
                 moduleName="orchestrator.core.samplestore.sql",

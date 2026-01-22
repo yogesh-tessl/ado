@@ -33,12 +33,17 @@ def create_sample_store(parameters: AdoCreateCommandParameters) -> str:
 
     if parameters.new_sample_store:
         console_print(f"{INFO}A new SQLSampleStore was requested.")
-        sample_store_configuration = SampleStoreConfiguration(
-            specification=SampleStoreSpecification(
-                module=SampleStoreModuleConf(
-                    moduleClass="SQLSampleStore",
-                    moduleName="orchestrator.core.samplestore.sql",
-                ),
+        # TODO(AP) 22/01/2026:
+        # https://github.com/IBM/ado/issues/449
+        # ty still doesn't understand pydantic's default_factory
+        sample_store_configuration = (
+            SampleStoreConfiguration(  # ty:ignore[missing-argument]
+                specification=SampleStoreSpecification(  # ty:ignore[missing-argument]
+                    module=SampleStoreModuleConf(
+                        moduleClass="SQLSampleStore",
+                        moduleName="orchestrator.core.samplestore.sql",
+                    ),
+                )
             )
         )
 

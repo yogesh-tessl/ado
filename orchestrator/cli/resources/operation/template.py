@@ -53,9 +53,13 @@ def template_operation(parameters: AdoTemplateCommandParameters) -> None:
 
     # Exit early on generic template
     if not parameters.operator_name:
-        model_instance = DiscoveryOperationResourceConfiguration(
+
+        # TODO(AP) 22/01/2026:
+        # https://github.com/IBM/ado/issues/449
+        # ty still doesn't understand pydantic's default_factory
+        model_instance = DiscoveryOperationResourceConfiguration(  # ty: ignore[missing-argument]
             spaces=["your-spaces"],
-            operation=DiscoveryOperationConfiguration(),
+            operation=DiscoveryOperationConfiguration(),  # ty: ignore[missing-argument]
         )
 
         serialise_pydantic_model(
@@ -126,9 +130,14 @@ def template_operation(parameters: AdoTemplateCommandParameters) -> None:
         parameters=default_operation_parameters,
     )
 
-    model_instance = DiscoveryOperationResourceConfiguration(
-        spaces=["your-spaces"],
-        operation=default_operation_configuration,
+    # TODO(AP) 22/01/2026:
+    # https://github.com/IBM/ado/issues/449
+    # ty still doesn't understand pydantic's default_factory
+    model_instance = (
+        DiscoveryOperationResourceConfiguration(  # ty: ignore[missing-argument]
+            spaces=["your-spaces"],
+            operation=default_operation_configuration,
+        )
     )
 
     # It's more helpful if the file name contains the operator name

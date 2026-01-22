@@ -78,8 +78,15 @@ def show_operation_results(parameters: AdoShowResultsCommandParameters) -> None:
         # We need to fetch the requests even when displaying the results
         # because we want to include the request ID and type.
         status.update("Fetching measurements")
-        measurement_requests = space.measurement_requests_for_operation(
-            operation_id=parameters.resource_id,
+
+        # TODO(AP): 22/01/2026
+        # https://github.com/IBM/ado/issues/450
+        # ty thinks the operation_id parameter does not exist
+        # it also thinks we're missing parameters for the function call
+        measurement_requests = (
+            space.measurement_requests_for_operation(  # ty: ignore[missing-argument]
+                operation_id=parameters.resource_id,  # ty: ignore[unknown-argument]
+            )
         )
 
     rows = []

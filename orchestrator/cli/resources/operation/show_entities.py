@@ -30,10 +30,14 @@ def show_operation_entities(parameters: AdoShowEntitiesCommandParameters) -> Non
             raise
 
         status.update("Fetching measurements")
-        output_df = space.complete_measurement_request_with_results_timeseries(
-            operation_id=parameters.resource_id,
-            output_format=parameters.entities_property_format.value,
-            limit_to_properties=parameters.properties,
+        # TODO(AP): 22/01/2026
+        # https://github.com/IBM/ado/issues/450
+        # ty thinks the keyword parameters do not exist
+        # it also thinks we're missing parameters for the function call
+        output_df = space.complete_measurement_request_with_results_timeseries(  # ty: ignore[missing-argument]
+            operation_id=parameters.resource_id,  # ty: ignore[unknown-argument]
+            output_format=parameters.entities_property_format.value,  # ty: ignore[unknown-argument]
+            limit_to_properties=parameters.properties,  # ty: ignore[unknown-argument]
         )
 
     file_name = f"{parameters.resource_id}_description_{entities_type}_{parameters.entities_property_format.value}.{parameters.entities_output_format.value}"

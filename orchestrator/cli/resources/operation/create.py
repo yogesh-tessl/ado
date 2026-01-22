@@ -1,5 +1,6 @@
 # Copyright (c) IBM Corporation
 # SPDX-License-Identifier: MIT
+import typing
 
 import pydantic
 import typer
@@ -258,7 +259,10 @@ def reuse_requested_latest_identifiers(
 ) -> None:
     updated = False
 
-    if CoreResourceKinds.ACTUATORCONFIGURATION in parameters.use_latest:
+    requested_use_latest_kinds = typing.cast(
+        list[CoreResourceKinds], parameters.use_latest
+    )
+    if CoreResourceKinds.ACTUATORCONFIGURATION in requested_use_latest_kinds:
         latest_recorded_actuator_configuration = (
             parameters.ado_configuration.latest_resource_ids.get(
                 CoreResourceKinds.ACTUATORCONFIGURATION
@@ -288,7 +292,7 @@ def reuse_requested_latest_identifiers(
             stderr=True,
         )
 
-    if CoreResourceKinds.DISCOVERYSPACE in parameters.use_latest:
+    if CoreResourceKinds.DISCOVERYSPACE in requested_use_latest_kinds:
         latest_recorded_space = parameters.ado_configuration.latest_resource_ids.get(
             CoreResourceKinds.DISCOVERYSPACE
         )

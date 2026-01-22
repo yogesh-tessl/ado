@@ -29,7 +29,7 @@ from orchestrator.core.discoveryspace.space import DiscoverySpace
 from orchestrator.metastore.base import ResourceDoesNotExistError
 
 
-def create_discovery_space(parameters: AdoCreateCommandParameters) -> str | None:
+def create_discovery_space(parameters: AdoCreateCommandParameters) -> str:
 
     # Fail early if there is an invalid combination of parameters
     mutually_exclusive_options = [
@@ -180,7 +180,7 @@ def create_discovery_space(parameters: AdoCreateCommandParameters) -> str | None
 
     if parameters.dry_run:
         console_print(ADO_CREATE_DRY_RUN_CONFIG_VALID, stderr=True)
-        return None
+        raise typer.Exit(0)
 
     if space_configuration.sampleStoreIdentifier == "default":
         info_message = (

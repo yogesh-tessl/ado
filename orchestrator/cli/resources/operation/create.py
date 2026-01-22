@@ -145,7 +145,7 @@ def create_operation(parameters: AdoCreateCommandParameters) -> str | None:
 
     if parameters.dry_run:
         console_print(ADO_CREATE_DRY_RUN_CONFIG_VALID, stderr=True)
-        return None
+        raise typer.Exit(0)
 
     try:
         operation_output = orchestrator.modules.operators.orchestrate.orchestrate(

@@ -45,7 +45,7 @@ from orchestrator.core.operation.resource import (
     OperationResourceEventEnum,
     OperationResourceStatus,
 )
-from orchestrator.core.resources import ADOResourceEventEnum, ADOResourceStatus
+from orchestrator.core.resources import ADOResourceEventEnum
 from orchestrator.utilities.output import (
     printable_pydantic_model,
 )
@@ -67,9 +67,6 @@ def format_default_ado_get_single_resource(
     if isinstance(resource, OperationResource):
         columns.insert(-1, "STATUS")
         columns.insert(-1, "EXIT_STATE")
-
-    if not resource:
-        return pd.DataFrame(columns=columns)
 
     metadata = resource.config.metadata or ConfigurationMetadata()
     output = {
@@ -99,7 +96,7 @@ def format_default_ado_get_single_resource(
     # AP: if we don't set the index manually, pandas will complain with
     #   ValueError: If using all scalar values, you must pass an index
     # We also use the columns array to reorder the columns
-    return pd.DataFrame(output, index=[0])[columns]
+    return pd.DataFrame(output, index=pd.Index([0]))[columns]
 
 
 def format_default_ado_get_multiple_resources(
@@ -108,24 +105,25 @@ def format_default_ado_get_multiple_resources(
     if resources.empty:
         return resources
 
-    # AP 13-12-2024:
-    # Currently only Operations support status updates.
-    # We try to keep it flexible.
-    status_model = pydantic.RootModel[list[ADOResourceStatus]]
-    if resource_kind == CoreResourceKinds.OPERATION:
-        status_model = pydantic.RootModel[list[OperationResourceStatus]]
-
-    # AP 13-12-2024:
-    # The exit state column should be there just for operations
-    # we do some trickery to ensure we put it before age
     columns = list(resources.columns)
-
     if resource_kind == CoreResourceKinds.OPERATION:
+        # AP 13-12-2024:
+        # The exit state column should be there just for operations
+        # we do some trickery to ensure we put it before age
         columns.insert(-1, "EXIT_STATE")
 
+        operation_resource_status_list_adapter = pydantic.TypeAdapter(
+            list[OperationResourceStatus]
+        )
         resources["STATUS"] = resources["STATUS"].apply(
-            lambda x: most_important_status_update(
-                status_model.model_validate(json.loads(x)).root if x else None
+            lambda x: (
+                most_important_status_update(
+                    operation_resource_status_list_adapter.validate_python(
+                        json.loads(x)
+                    )
+                )
+                if x
+                else None
             )
         )
 

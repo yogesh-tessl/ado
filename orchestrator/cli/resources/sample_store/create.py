@@ -1,5 +1,7 @@
 # Copyright (c) IBM Corporation
 # SPDX-License-Identifier: MIT
+import pathlib
+import typing
 
 import pydantic
 import typer
@@ -41,9 +43,13 @@ def create_sample_store(parameters: AdoCreateCommandParameters) -> str:
         )
 
     else:
+        # resource_configuration_file is required if new_sample_store is False
+        resource_configuration_file = typing.cast(
+            pathlib.Path, parameters.resource_configuration_file
+        )
         try:
             sample_store_configuration = SampleStoreConfiguration.model_validate(
-                yaml.safe_load(parameters.resource_configuration_file.read_text())
+                yaml.safe_load(resource_configuration_file.read_text())
             )
         except pydantic.ValidationError as error:
             console_print(

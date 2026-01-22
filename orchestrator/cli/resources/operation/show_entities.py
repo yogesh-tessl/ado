@@ -1,5 +1,6 @@
 # Copyright (c) IBM Corporation
 # SPDX-License-Identifier: MIT
+import typing
 
 from rich.status import Status
 
@@ -18,11 +19,12 @@ from orchestrator.metastore.base import (
 def show_operation_entities(parameters: AdoShowEntitiesCommandParameters) -> None:
 
     entities_type = "timeseries"
+    operation_id = typing.cast(str, parameters.resource_id)
 
     with Status(ADO_SPINNER_QUERYING_DB) as status:
         try:
             space = DiscoverySpace.from_operation_id(
-                operation_id=parameters.resource_id,
+                operation_id=operation_id,
                 project_context=parameters.ado_configuration.project_context,
             )
         except (ResourceDoesNotExistError, NoRelatedResourcesError):
@@ -35,12 +37,12 @@ def show_operation_entities(parameters: AdoShowEntitiesCommandParameters) -> Non
         # ty thinks the keyword parameters do not exist
         # it also thinks we're missing parameters for the function call
         output_df = space.complete_measurement_request_with_results_timeseries(  # ty: ignore[missing-argument]
-            operation_id=parameters.resource_id,  # ty: ignore[unknown-argument]
+            operation_id=operation_id,  # ty: ignore[unknown-argument]
             output_format=parameters.entities_property_format.value,  # ty: ignore[unknown-argument]
             limit_to_properties=parameters.properties,  # ty: ignore[unknown-argument]
         )
 
-    file_name = f"{parameters.resource_id}_description_{entities_type}_{parameters.entities_property_format.value}.{parameters.entities_output_format.value}"
+    file_name = f"{operation_id}_description_{entities_type}_{parameters.entities_property_format.value}.{parameters.entities_output_format.value}"
     df_to_output(
         df=output_df,
         output_format=parameters.entities_output_format.value,

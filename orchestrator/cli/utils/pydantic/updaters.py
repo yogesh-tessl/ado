@@ -3,16 +3,20 @@
 
 import contextlib
 import json
+from typing import Annotated, TypeVar
 
 import pydantic
 import typer
 
 from orchestrator.cli.utils.output.prints import ERROR, console_print, cyan
 
+T = TypeVar("T")
+PydanticModel = Annotated[T, pydantic.BaseModel]
+
 
 def override_values_in_pydantic_model(
-    model: pydantic.BaseModel, override_values: list[dict[str, str]]
-) -> pydantic.BaseModel:
+    model: PydanticModel, override_values: list[dict[str, str]]
+) -> PydanticModel:
     import jsonpath_ng.ext
     from jsonpath_ng.exceptions import JsonPathLexerError, JsonPathParserError
 

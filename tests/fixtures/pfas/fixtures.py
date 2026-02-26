@@ -9,6 +9,7 @@ from orchestrator.core.discoveryspace.config import DiscoverySpaceConfiguration
 from orchestrator.core.discoveryspace.space import DiscoverySpace
 from orchestrator.core.samplestore.base import ActiveSampleStore
 from orchestrator.core.samplestore.config import SampleStoreConfiguration
+from orchestrator.core.samplestore.resource import SampleStoreResource
 from orchestrator.core.samplestore.sql import SQLSampleStore
 
 
@@ -45,12 +46,15 @@ def pfas_space_configuration_str() -> str:
 @pytest.fixture
 def pfas_sample_store(
     pfas_sample_store_configuration_str: str,
-    create_sample_store: Callable[[SampleStoreConfiguration], ActiveSampleStore],
+    create_sample_store: Callable[
+        [SampleStoreConfiguration], tuple[SampleStoreResource, ActiveSampleStore]
+    ],
 ) -> SQLSampleStore:
     sample_store_configuration = SampleStoreConfiguration.model_validate(
         yaml.safe_load(pfas_sample_store_configuration_str)
     )
-    return create_sample_store(sample_store_configuration)
+    _, sample_store = create_sample_store(sample_store_configuration)
+    return sample_store
 
 
 @pytest.fixture

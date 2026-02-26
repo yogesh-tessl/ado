@@ -21,6 +21,7 @@ from orchestrator.core.samplestore.config import (
     SampleStoreModuleConf,
     SampleStoreSpecification,
 )
+from orchestrator.core.samplestore.resource import SampleStoreResource
 from orchestrator.metastore.project import ProjectContext
 from orchestrator.modules.actuators.registry import ActuatorRegistry
 from orchestrator.schema.entityspace import EntitySpaceRepresentation
@@ -62,7 +63,9 @@ def test_discovery_space_with_parameterized_experiments(
     parameterized_references: list[ExperimentReference],
     valid_ado_project_context: ProjectContext,
     global_registry: ActuatorRegistry,
-    create_sample_store: Callable[[SampleStoreConfiguration], ActiveSampleStore],
+    create_sample_store: Callable[
+        [SampleStoreConfiguration], tuple[SampleStoreResource, ActiveSampleStore]
+    ],
 ) -> None:
 
     from orchestrator.core.samplestore.config import (
@@ -72,7 +75,7 @@ def test_discovery_space_with_parameterized_experiments(
     ms = MeasurementSpace.measurementSpaceFromExperimentReferences(
         experimentReferences=parameterized_references
     )
-    sample_store = create_sample_store(
+    _, sample_store = create_sample_store(
         SampleStoreConfiguration(
             specification=SampleStoreSpecification(
                 module=SampleStoreModuleConf(

@@ -16,6 +16,7 @@ from orchestrator.core import ActuatorConfigurationResource
 from orchestrator.core.discoveryspace.space import DiscoverySpace
 from orchestrator.core.samplestore.base import ActiveSampleStore
 from orchestrator.core.samplestore.config import SampleStoreConfiguration
+from orchestrator.core.samplestore.resource import SampleStoreResource
 from orchestrator.metastore.project import ProjectContext
 from orchestrator.metastore.sqlstore import SQLStore
 
@@ -24,12 +25,14 @@ from orchestrator.metastore.sqlstore import SQLStore
 def create_sample_store(
     sql_store: SQLStore,
     valid_ado_project_context: ProjectContext,
-) -> Callable[[SampleStoreConfiguration], ActiveSampleStore]:
+) -> Callable[
+    [SampleStoreConfiguration], tuple[SampleStoreResource, ActiveSampleStore]
+]:
     # Factory as fixture
     # ref: https://docs.pytest.org/en/stable/how-to/fixtures.html#factories-as-fixtures
     def _create_sample_store(
         configuration: SampleStoreConfiguration,
-    ) -> ActiveSampleStore:
+    ) -> tuple[SampleStoreResource, ActiveSampleStore]:
 
         from orchestrator.core.samplestore.utils import create_sample_store_resource
 
@@ -39,12 +42,12 @@ def create_sample_store(
             valid_ado_project_context.metadataStore
         )
 
-        _, sample_store = create_sample_store_resource(
+        sample_store_resource, sample_store = create_sample_store_resource(
             configuration,
             sql_store,
         )
 
-        return sample_store
+        return sample_store_resource, sample_store
 
     return _create_sample_store
 

@@ -78,7 +78,9 @@ def sql_store_with_resources_preloaded(
 
 @pytest.fixture
 def empty_sample_store(
-    create_sample_store: Callable[[SampleStoreConfiguration], ActiveSampleStore],
+    create_sample_store: Callable[
+        [SampleStoreConfiguration], tuple[SampleStoreResource, ActiveSampleStore]
+    ],
 ) -> SQLSampleStore:
     sample_store_configuration = SampleStoreConfiguration(
         specification=SampleStoreSpecification(
@@ -88,4 +90,5 @@ def empty_sample_store(
             ),
         )
     )
-    return create_sample_store(sample_store_configuration)
+    _, sample_store = create_sample_store(sample_store_configuration)
+    return sample_store

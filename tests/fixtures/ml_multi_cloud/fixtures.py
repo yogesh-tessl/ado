@@ -24,6 +24,7 @@ from orchestrator.core.samplestore.config import (
     SampleStoreReference,
 )
 from orchestrator.core.samplestore.csv import CSVSampleStore
+from orchestrator.core.samplestore.resource import SampleStoreResource
 from orchestrator.core.samplestore.sql import SQLSampleStore
 from orchestrator.metastore.project import ProjectContext
 from orchestrator.metastore.sqlstore import SQLResourceStore
@@ -51,14 +52,17 @@ from orchestrator.schema.result import (
 
 @pytest.fixture
 def ml_multi_cloud_sample_store(
-    create_sample_store: Callable[[SampleStoreConfiguration], ActiveSampleStore],
+    create_sample_store: Callable[
+        [SampleStoreConfiguration], tuple[SampleStoreResource, ActiveSampleStore]
+    ],
 ) -> SQLSampleStore:
     sample_store_configuration = SampleStoreConfiguration.model_validate(
         yaml.safe_load(
             pathlib.Path("tests/resources/ml_multicloud_sample_store.yaml").read_text()
         )
     )
-    return create_sample_store(sample_store_configuration)
+    _, sample_store = create_sample_store(sample_store_configuration)
+    return sample_store
 
 
 @pytest.fixture

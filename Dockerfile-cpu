@@ -3,6 +3,10 @@ ARG BASE_IMAGE=mirror.gcr.io/rayproject/ray:latest-py${PYTHON_VERSION}-cpu
 FROM $BASE_IMAGE
 
 USER 0
+RUN apt update && \
+    apt install openjdk-25-jdk -y && \
+    apt clean && \
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 RUN chgrp -R 0 /home/ray && \
     chmod -R g=u /home/ray
 USER 1000
